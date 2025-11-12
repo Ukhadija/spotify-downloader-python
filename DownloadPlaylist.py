@@ -331,17 +331,24 @@ def log_progress(download_id, message, message_type="info"):
         print(f"[{download_id}] Log message: check download folder for download ", flush=True)
 
 class MyLogger(object):
-    def __init__(self, download_id):
+    def __init__(self, download_id=None):
         self.download_id = download_id
-        
+    
     def debug(self, msg):
+        # You can log debug messages if needed
+        if "Downloading" in msg or "Converting" in msg:
+            print(f"DEBUG: {msg}")
         pass
 
     def warning(self, msg):
-        pass
+        if self.download_id:
+            update_progress(self.download_id, f"Warning: {msg}", "warning")
+        print(f"WARNING: {msg}")
 
     def error(self, msg):
-        log_progress(self.download_id, msg, "error")
+        if self.download_id:
+            update_progress(self.download_id, f"Error: {msg}", "error")
+        print(f"ERROR: {msg}")
 
 def get_ydl_opts(download_id, output_template):
     """Get youtube-dl options with progress tracking"""
@@ -356,7 +363,7 @@ def get_ydl_opts(download_id, output_template):
             'preferredcodec': 'mp3',
             'preferredquality': '320',
         }],
-        'logger': MyLogger(),
+        'logger': MyLogger(download_id=download_id),
         
         # Anti-bot and reliability options
         'retries': 20,
@@ -724,3 +731,4 @@ def get_spotify_info():
 if __name__ == '__main__':
 
     app.run(host='0.0.0.0', port=5000, debug=False)
+
