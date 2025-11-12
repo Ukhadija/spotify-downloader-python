@@ -337,23 +337,23 @@ class MyLogger(object):
     def debug(self, msg):
         # You can log debug messages if needed
         if "Downloading" in msg or "Converting" in msg:
-            print(f"DEBUG: {msg}")
+            if self.download_id:
+                log_progress(self.download_id, f"Debug: {msg}", "info")
         pass
 
     def warning(self, msg):
         if self.download_id:
-            update_progress(self.download_id, f"Warning: {msg}", "warning")
+            log_progress(self.download_id, f"Warning: {msg}", "warning")
         print(f"WARNING: {msg}")
 
     def error(self, msg):
         if self.download_id:
-            update_progress(self.download_id, f"Error: {msg}", "error")
+            log_progress(self.download_id, f"Error: {msg}", "error")
         print(f"ERROR: {msg}")
 
 def get_ydl_opts(download_id, output_template):
     """Get youtube-dl options with progress tracking"""
     return {
-        'ffmpeg_location': r"C:\Users\Dell\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-full_build\bin\ffmpeg.exe",
         'format': 'bestaudio/best',
         'extractaudio': True,
         'outtmpl': '%(title)s.%(ext)s',
@@ -731,4 +731,5 @@ def get_spotify_info():
 if __name__ == '__main__':
 
     app.run(host='0.0.0.0', port=5000, debug=False)
+
 
