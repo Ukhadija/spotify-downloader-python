@@ -349,22 +349,46 @@ def get_ydl_opts(download_id, output_template):
         'ffmpeg_location': r"C:\Users\Dell\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-full_build\bin\ffmpeg.exe",
         'format': 'bestaudio/best',
         'extractaudio': True,
-        'outtmpl': output_template,
+        'outtmpl': '%(title)s.%(ext)s',
         'addmetadata': True,
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
             'preferredquality': '320',
         }],
-        'logger': MyLogger(download_id),
+        'logger': MyLogger(),
         
-        # Add these options to avoid 403 errors:
-        'retries': 3,  # Retry failed downloads
-        'fragment_retries': 3,  # Retry fragmented downloads
+        # Anti-bot and reliability options
+        'retries': 20,
+        'fragment_retries': 20,
         'skip_unavailable_fragments': True,
-        'extract_flat': False,
-        'http_chunk_size': 10485760,  # 10MB chunks
-        'continuedl': True,
+        'ignoreerrors': True,
+        'no_warnings': False,
+        'quiet': False,
+        'nooverwrites': True,
+        
+        # YouTube specific options
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android', 'web'],
+                'player_skip': ['configs', 'webpage', 'js'],
+            }
+        },
+        
+        # HTTP headers to mimic real browser
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+        },
+        
+        # Throttle requests
+        'ratelimit': 5000000,  # 5 MB/s
+        'throttledratelimit': 1000000,  # 1 MB/s when throttled
     }
 
 def check_permissions():
@@ -698,4 +722,5 @@ def get_spotify_info():
         }), 500
 
 if __name__ == '__main__':
+
     app.run(host='0.0.0.0', port=5000, debug=False)
